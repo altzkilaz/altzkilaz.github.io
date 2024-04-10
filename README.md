@@ -1,5 +1,5 @@
 Ping pong score keeper
-(My very first official web development code)
+(My very first web development coding project)
 
 V0.1
 -Successfully created a functional website to publish in GitHub
