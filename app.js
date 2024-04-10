@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function(){
         player1.button.disabled = false;
         player2.button.disabled = false;
         resetButton.disabled = false;
-        scoreLimit = event.target.value;
+        scoreLimit = parseInt(event.target.value);
     });
     
     //buttons
@@ -63,6 +63,8 @@ document.addEventListener('DOMContentLoaded', function(){
         scoreLimitButton.value = 0;
         resetButton.disabled = true;
         thumbnailElement.src = defaultPic;
+        scoreLimit = null;
+        oneMoreRound = 0;
     })
 
     //score keeping
@@ -79,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function(){
             }
         }else if(player.score === opponent.score && opponent.score !== (scoreLimit - 1)){
             thumbnailElement.src = tiePic;
-        }else if(player.score == scoreLimit){
+        }else if(player.score === scoreLimit){
             endGame(player, opponent);
         }else if(player.score == (scoreLimit - 1) && opponent.score == (scoreLimit - 1)){
             oneMoreRound += 1;
@@ -93,12 +95,16 @@ document.addEventListener('DOMContentLoaded', function(){
     };
 
     function endGame(player, opponent){
+        for(let p of [player, opponent]){
+            p.button.disabled = true;
+            p.score = 0;
+        }
         jsConfetti.addConfetti();
-        player.button.disabled = true;
         player.display.classList.add('has-text-primary');
-        opponent.button.disabled = true;
         opponent.display.classList.add('has-text-danger');
         thumbnailElement.src = winPic;
+        scoreLimit = null;
+        oneMoreRound = 0;
     }
     //score adding end
 });
