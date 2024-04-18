@@ -11,3 +11,6 @@ V0.2
 
 V0.3
 -Added picture initialization for optimization
+
+V0.3.1
+-Quick Hotfix on First to two, Supposed to be when both players is on a tie it should reset the first to two and the players must thrive to get the first two consecutive win not counting the previous tie score
