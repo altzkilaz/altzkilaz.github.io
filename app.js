@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', function() {
     //defaults
     const player1 = {
         score: 0,
@@ -30,9 +30,9 @@ document.addEventListener('DOMContentLoaded', function(){
 
     const jsConfetti = new JSConfetti();
 
-    let scoreLimit = null;
-    let oneMoreRound = null;
-    let prevScorer = null;
+    let scoreLimit = 0;
+    let oneMoreRound = 0;
+    let winCount = 0;
 
     player1.button.disabled = true;
     player2.button.disabled = true;
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function(){
         let loadedCount = 0;
         let totalCount = Object.keys(images).length;
         loadingScreenText.innerText = `Loaded ${loadedCount} out of ${totalCount}`;
-        
+
         for (let key in images) {
             if (images.hasOwnProperty(key)) {
                 let img = new Image();
@@ -59,35 +59,35 @@ document.addEventListener('DOMContentLoaded', function(){
                 img.src = images[key];
             }
         }
-    }
+    };
 
     function addDelay() {
         setTimeout(function() {
             console.log("All images preloaded, delay completed!");
             loadingScreen.remove();
         }, 1000);
-    }
+    };
     preloadImages(images, addDelay);
 
     //drop down
-    scoreLimitButton.addEventListener('change', function(event){
+    scoreLimitButton.addEventListener('change', function(event) {
         player1.button.disabled = false;
         player2.button.disabled = false;
         resetButton.disabled = false;
         scoreLimit = parseInt(event.target.value);
     });
-    
+
     //buttons
-    player1.button.addEventListener('click', function(){
+    player1.button.addEventListener('click', function() {
         scoreAdding(player1, player2);
     });
 
-    player2.button.addEventListener('click', function(){
+    player2.button.addEventListener('click', function() {
         scoreAdding(player2, player1);
     });
 
-    resetButton.addEventListener('click', function(){
-        for(let p of [player1, player2]){
+    resetButton.addEventListener('click', function() {
+        for (let p of [player1, player2]) {
             p.display.innerText = 0;
             p.button.disabled = true;
             p.score = 0;
@@ -97,39 +97,44 @@ document.addEventListener('DOMContentLoaded', function(){
         scoreLimitButton.value = 0;
         resetButton.disabled = true;
         thumbnailElement.src = images.defaultPic;
-        scoreLimit = null;
+        scoreLimit = 0;
         oneMoreRound = 0;
-    })
+        winCount = 0;
+    });
 
     //score keeping
-    function scoreAdding(player, opponent){
+    function scoreAdding(player, opponent) {
         player.score += 1;
         player.display.innerText = player.score;
-        if(oneMoreRound > 0){
-            if(prevScorer === player.display.id){    
-                endGame(player, opponent);
-            }else{
-                scoreLimit += 1;
-                prevScorer = player.display.id;
+        if (oneMoreRound > 0) {
+            if (player.score === opponent.score) {
+                winCount = 0;
+                thumbnailElement.src = images.twoMorePic;
+            } else if (player.score > opponent.score) {
+                winCount += 1;
                 thumbnailElement.src = images.oneMorePic;
+                if (winCount === 2) {
+                    endGame(player, opponent);
+                }
             }
-        }else if(player.score === opponent.score && opponent.score !== (scoreLimit - 1)){
+        } else if (player.score === opponent.score && opponent.score !== (scoreLimit - 1)) {
             thumbnailElement.src = images.tiePic;
-        }else if(player.score === scoreLimit){
+        } else if (player.score === scoreLimit && oneMoreRound === 0) {
             endGame(player, opponent);
-        }else if(player.score == (scoreLimit - 1) && opponent.score == (scoreLimit - 1)){
+        } else if ((player.score == (scoreLimit - 1) && opponent.score == (scoreLimit - 1)) && oneMoreRound === 0) {
             oneMoreRound += 1;
-            scoreLimit += 1;
-            prevScorer = player.display.id;
             thumbnailElement.src = images.twoMorePic;
-        }else{
+
+        } else {
+            console.log((player.score == (scoreLimit - 1) && opponent.score == (scoreLimit - 1)) + oneMoreRound === 0);
+            console.log(oneMoreRound);
             scoreLimitButton.disabled = true;
             thumbnailElement.src = images.scorePic
         }
     };
 
-    function endGame(player, opponent){
-        for(let p of [player, opponent]){
+    function endGame(player, opponent) {
+        for (let p of [player, opponent]) {
             p.button.disabled = true;
             p.score = 0;
         }
@@ -137,8 +142,8 @@ document.addEventListener('DOMContentLoaded', function(){
         player.display.classList.add('has-text-primary');
         opponent.display.classList.add('has-text-danger');
         thumbnailElement.src = images.winPic;
-        scoreLimit = null;
+        scoreLimit = 0;
         oneMoreRound = 0;
-    }
+    };
     //score adding end
 });
