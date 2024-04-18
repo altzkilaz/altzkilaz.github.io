@@ -12,28 +12,62 @@ document.addEventListener('DOMContentLoaded', function(){
         button: document.getElementById('playerTwo')
     }
 
+    const images = {
+        defaultPic: 'https://images.unsplash.com/photo-1624936188350-883a61a44116?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+        scorePic: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGNwNXh0YzRiM3FqMzJ1eXp6Mzgzemw3bHp3dmd3aG51NnBtcnViMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4wnrJ7cWFluAZVkHBU/giphy.gif',
+        tiePic: 'https://media1.tenor.com/m/Hbm5ksVowZsAAAAC/referee-%E5%B9%B3%E6%89%8B.gif',
+        winPic: 'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWVmd3Rkb3drbWVmbXg1aDlyMGpjY3dveHQ4aXA4MTJscHM0enltMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qPgTAqlWVFWwtnwOyF/giphy.gif',
+        oneMorePic: 'https://y.yarn.co/baa4ad45-6fa2-43b3-a560-728030191415_text.gif',
+        twoMorePic: 'https://media1.tenor.com/m/Na51d6wtvtsAAAAC/can-i-get-two-more-please-i-want-more.gif'
+    }
+
     const resetButton = document.getElementById('reset');
     const scoreLimitButton = document.getElementById('scoreLimit');
-    let scoreLimit = null;
-    let oneMoreRound = null;
-    let prevScorer = null;
-
+    const loadingScreen = document.getElementById('loading');
+    const loadingScreenText = document.getElementById('loadingText');
     const thumbnailElement = document.getElementById('thumbnail');
     const hideOption = document.getElementById('hideOption');
 
-    const jsConfetti = new JSConfetti()
+    const jsConfetti = new JSConfetti();
 
-    const defaultPic = 'https://images.unsplash.com/photo-1624936188350-883a61a44116?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-    const scorePic = 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdGNwNXh0YzRiM3FqMzJ1eXp6Mzgzemw3bHp3dmd3aG51NnBtcnViMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4wnrJ7cWFluAZVkHBU/giphy.gif';
-    const tiePic = 'https://media1.tenor.com/m/Hbm5ksVowZsAAAAC/referee-%E5%B9%B3%E6%89%8B.gif';
-    const winPic = 'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWVmd3Rkb3drbWVmbXg1aDlyMGpjY3dveHQ4aXA4MTJscHM0enltMyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qPgTAqlWVFWwtnwOyF/giphy.gif';
-    const twoMorePic = 'https://media1.tenor.com/m/Na51d6wtvtsAAAAC/can-i-get-two-more-please-i-want-more.gif';
-    const oneMorePic = 'https://y.yarn.co/baa4ad45-6fa2-43b3-a560-728030191415_text.gif';
+    let scoreLimit = null;
+    let oneMoreRound = null;
+    let prevScorer = null;
 
     player1.button.disabled = true;
     player2.button.disabled = true;
     resetButton.disabled = true;
     hideOption.style.display = 'none';
+
+    //loading screen
+    function preloadImages(images, callback) {
+        let loadedCount = 0;
+        let totalCount = Object.keys(images).length;
+        loadingScreenText.innerText = `Loaded ${loadedCount} out of ${totalCount}`;
+        
+        for (let key in images) {
+            if (images.hasOwnProperty(key)) {
+                let img = new Image();
+                img.onload = function() {
+                    loadedCount++;
+                    loadingScreenText.innerText = `Loaded ${loadedCount} out of ${totalCount}`;
+                    if (loadedCount === totalCount) {
+                        loadingScreenText.innerText = 'Done!'
+                        callback();
+                    }
+                };
+                img.src = images[key];
+            }
+        }
+    }
+
+    function addDelay() {
+        setTimeout(function() {
+            console.log("All images preloaded, delay completed!");
+            loadingScreen.remove();
+        }, 1000);
+    }
+    preloadImages(images, addDelay);
 
     //drop down
     scoreLimitButton.addEventListener('change', function(event){
@@ -62,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function(){
         scoreLimitButton.disabled = false;
         scoreLimitButton.value = 0;
         resetButton.disabled = true;
-        thumbnailElement.src = defaultPic;
+        thumbnailElement.src = images.defaultPic;
         scoreLimit = null;
         oneMoreRound = 0;
     })
@@ -77,20 +111,20 @@ document.addEventListener('DOMContentLoaded', function(){
             }else{
                 scoreLimit += 1;
                 prevScorer = player.display.id;
-                thumbnailElement.src = oneMorePic;
+                thumbnailElement.src = images.oneMorePic;
             }
         }else if(player.score === opponent.score && opponent.score !== (scoreLimit - 1)){
-            thumbnailElement.src = tiePic;
+            thumbnailElement.src = images.tiePic;
         }else if(player.score === scoreLimit){
             endGame(player, opponent);
         }else if(player.score == (scoreLimit - 1) && opponent.score == (scoreLimit - 1)){
             oneMoreRound += 1;
             scoreLimit += 1;
             prevScorer = player.display.id;
-            thumbnailElement.src = twoMorePic;
+            thumbnailElement.src = images.twoMorePic;
         }else{
             scoreLimitButton.disabled = true;
-            thumbnailElement.src = scorePic
+            thumbnailElement.src = images.scorePic
         }
     };
 
@@ -102,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function(){
         jsConfetti.addConfetti();
         player.display.classList.add('has-text-primary');
         opponent.display.classList.add('has-text-danger');
-        thumbnailElement.src = winPic;
+        thumbnailElement.src = images.winPic;
         scoreLimit = null;
         oneMoreRound = 0;
     }
