@@ -8,3 +8,6 @@ V0.1
 
 V0.2
 -Bug fixes regarding first to two wins causes issues in the next reset
+
+V0.3
+-Added picture initialization for optimization
