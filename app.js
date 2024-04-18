@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
         thumbnailElement.src = images.winPic;
         scoreLimit = 0;
         oneMoreRound = 0;
+        winCount = 0;
     };
     //score adding end
 });
